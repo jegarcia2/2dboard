@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle">
+    <value>My Application</value>
+  </data>
+  <data name="HelloWorld">
+    <value>Hello world!</value>
+  </data>
+  <data name="WelcomeText">
+    <value>Hello, welcome!</value>
+  </data>
+  <data name="ButtonText">
+    <value>Click me!</value>
+  </data>
+  <data name="MenuOptions">
+    <value>Options</value>
+  </data>
+  <data name="MenuSettings">
+    <value>Settings</value>
+  </data>
+  <data name="MenuHelp">
+    <value>Help</value>
+  </data>
+  <data name="MenuExit">
+    <value>Exit</value>
+  </data>
+  <data name="MenuLanguage">
+    <value>Language</value>
+  </data>
+</root>
