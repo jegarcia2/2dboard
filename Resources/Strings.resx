@@ -27,4 +27,22 @@
   <data name="MenuLanguage">
     <value>Language</value>
   </data>
+  <data name="YesNoMenuTitle">
+    <value>Please Confirm</value>
+  </data>
+    <data name="ChangeLanguageText">
+    <value>Changing the language will result in the App being reseted, meaning any unsaved progress will be erased. Would you like to continue?</value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
 </root>

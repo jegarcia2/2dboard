@@ -18,3 +18,4 @@ C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\_2
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\_2dboard.Resources.Strings.es.resources
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\es\2dboard.resources.cs
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\es\2dboard.resources.dll
+C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.sourcelink.json

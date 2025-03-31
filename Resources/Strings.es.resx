@@ -27,4 +27,10 @@
   <data name="MenuLanguage">
     <value>Idioma</value>
   </data>
+    <data name="YesNoMenuTitle">
+    <value>Por favor confirme</value>
+  </data>
+    <data name="ChangeLanguageText">
+    <value>Cambiar el idio hará que la aplicación se reinicie, cualquier progreso sin guardar se borrará. ¿Desea continuar?</value>
+  </data>
 </root>
