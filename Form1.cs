@@ -65,33 +65,54 @@ namespace _2dboard
             mainLayout.Controls.Add(menuPanel, 0, 1);
 
 
-            //Centered Panel For Misc
+            // Centered Panel For Misc
             Panel contentPanel = new Panel();
             contentPanel.Dock = DockStyle.Fill;
             mainLayout.Controls.Add(contentPanel, 0, 2);
 
-            FlowLayoutPanel contentFlow = new FlowLayoutPanel{
-                FlowDirection = FlowDirection.LeftToRight,
+            TableLayoutPanel contentLayout = new TableLayoutPanel
+            {
                 Dock = DockStyle.Fill,
-                AutoSize = true,
-                WrapContents = false,
+                ColumnCount = 2
+            };
+            contentLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 70)); // Canvas (Left)
+            contentLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30)); // Sidebar (Right)
+
+            contentPanel.Controls.Add(contentLayout);
+
+            DraggableCanvas canvas = new DraggableCanvas
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.Black
             };
 
-            contentPanel.Controls.Add(contentFlow);
+            Panel sidePanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.LightGray
+            };
 
-            Label label = new Label
+            contentLayout.Controls.Add(canvas, 0, 0);
+            contentLayout.Controls.Add(sidePanel, 1, 0);
+
+            //Footer
+            Panel footerPanel = new Panel
             {
-                Text = rm.GetString("WelcomeText"),
+                Height = 30,
+                Dock = DockStyle.Fill, 
+                BackColor = Color.LightGray
+            }; 
+
+            Label footerLabel = new Label
+            {
+                Text = "This is the footer",
                 AutoSize = true,
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left // Keeps it at the bottom-left
             };
-            contentFlow.Controls.Add(label);
-            
-            Button button = new Button
-            {
-                Text = "Click me!",
-            };
-            button.Click += (sender, e) => MessageBox.Show(rm.GetString("HelloWorld"));
-            contentFlow.Controls.Add(button);
+
+            footerPanel.Controls.Add(footerLabel);
+
+            mainLayout.Controls.Add(footerLabel, 0, 3);
         }
 
         void SetLanguage(string language)
@@ -107,13 +128,14 @@ namespace _2dboard
 
         void SetupTableLayout(TableLayoutPanel mainLayout) {
             mainLayout.Dock = DockStyle.Fill;
-            mainLayout.RowCount = 3; // MenuStrip, Button Panel, Main Content
+            mainLayout.RowCount = 4;
             mainLayout.ColumnCount = 1;
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // For MenuStrip
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 50)); // For Buttons Menu
-            mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // Remaining space for content
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // MenuStrip
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 40)); // Buttons Menu
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // Main Content (Expands)
+            mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // Footer
+
             Controls.Add(mainLayout);
         }
-    
     }
 }
