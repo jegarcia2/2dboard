@@ -31,6 +31,33 @@
     <value>Por favor confirme</value>
   </data>
     <data name="ChangeLanguageText">
-    <value>Cambiar el idio hará que la aplicación se reinicie, cualquier progreso sin guardar se borrará. ¿Desea continuar?</value>
+    <value>Cambiar el idioma hará que la aplicación se reinicie, cualquier progreso sin guardar se borrará. ¿Desea continuar?</value>
+  </data>
+      <data name="Coordinates">
+    <value>Coordenadas</value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+      <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+      <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
+  </data>
+    <data name="">
+    <value></value>
   </data>
 </root>

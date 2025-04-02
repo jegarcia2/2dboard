@@ -33,8 +33,8 @@
     <data name="ChangeLanguageText">
     <value>Changing the language will result in the App being reseted, meaning any unsaved progress will be erased. Would you like to continue?</value>
   </data>
-    <data name="">
-    <value></value>
+    <data name="Coordinates">
+    <value>Coordinates</value>
   </data>
     <data name="">
     <value></value>

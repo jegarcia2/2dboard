@@ -13,6 +13,7 @@ namespace _2dboard
 
         public Form1()
         {
+            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             //Creating Language Handler
             CultureInfo.CurrentUICulture = new CultureInfo(settings.Language);
             rm = new ResourceManager("_2dboard.Resources.Strings", typeof(Form1).Assembly);
@@ -45,27 +46,26 @@ namespace _2dboard
 
             mainLayout.Controls.Add(menuStrip, 0, 0);
 
-            //Flow Layout (Upper buttons)
-            FlowLayoutPanel menuPanel = new FlowLayoutPanel {
-                Height = 50,
+            //Footer
+            Panel footerPanel = new Panel
+            {
+                Height = 30,
+                Dock = DockStyle.Fill, 
+                BackColor = Color.LightGray
+            }; 
+
+            Label footerLabel = new Label
+            {
+                Text = $"{rm.GetString("Coordinates")} - X: 0 Y: 0",
                 AutoSize = true,
-                FlowDirection = FlowDirection.LeftToRight,
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
 
-            //Temp iteration to visualize buttons location
-            for (int i = 0; i < 5; i++)
-            {
-                Button btn = new Button();
-                btn.Size = new Size(10, 10); 
-                btn.FlatStyle = FlatStyle.Flat;
-                btn.BackgroundImageLayout = ImageLayout.Zoom;
-                menuPanel.Controls.Add(btn);
-            }
+            footerPanel.Controls.Add(footerLabel);
 
-            mainLayout.Controls.Add(menuPanel, 0, 1);
+            mainLayout.Controls.Add(footerLabel, 0, 3);
 
-
-            // Centered Panel For Misc
+            // Drawing Canvas
             Panel contentPanel = new Panel();
             contentPanel.Dock = DockStyle.Fill;
             mainLayout.Controls.Add(contentPanel, 0, 2);
@@ -86,6 +86,13 @@ namespace _2dboard
                 BackColor = Color.Black
             };
 
+            canvas.MouseMove += (sender, e) => 
+            {
+                footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
+            };
+
+            //SidePanel
+
             Panel sidePanel = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -95,24 +102,55 @@ namespace _2dboard
             contentLayout.Controls.Add(canvas, 0, 0);
             contentLayout.Controls.Add(sidePanel, 1, 0);
 
-            //Footer
-            Panel footerPanel = new Panel
-            {
-                Height = 30,
-                Dock = DockStyle.Fill, 
-                BackColor = Color.LightGray
-            }; 
-
-            Label footerLabel = new Label
-            {
-                Text = "This is the footer",
+            //Flow Layout (Upper buttons)
+            FlowLayoutPanel menuPanel = new FlowLayoutPanel {
+                Height = 50,
                 AutoSize = true,
-                Anchor = AnchorStyles.Bottom | AnchorStyles.Left // Keeps it at the bottom-left
+                FlowDirection = FlowDirection.LeftToRight,
             };
 
-            footerPanel.Controls.Add(footerLabel);
+            // Buttons
+                //Select Button
+            Button selectButton = new Button
+            {
+                Size = new Size(15,15),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Red
+            };
 
-            mainLayout.Controls.Add(footerLabel, 0, 3);
+            selectButton.Click += (sender, e) => {
+                changeSelectedMouse(canvas, "Select");
+                canvas.Cursor = Cursors.Default;                
+            };
+
+            menuPanel.Controls.Add(selectButton);
+
+                //Move Button
+            Button moveButton = new Button
+            {
+                Size = new Size(15,15),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Black
+            };
+
+            moveButton.Click += (sender, e) => {
+                changeSelectedMouse(canvas, "Move");
+                canvas.Cursor = Cursors.Hand;
+            };
+
+            menuPanel.Controls.Add(moveButton);
+
+            //Temp iteration to visualize buttons location
+            for (int i = 0; i < 5; i++)
+            {
+                Button btn = new Button();
+                btn.Size = new Size(10, 10); 
+                btn.FlatStyle = FlatStyle.Flat;
+                btn.BackgroundImageLayout = ImageLayout.Zoom;
+                menuPanel.Controls.Add(btn);
+            }
+
+            mainLayout.Controls.Add(menuPanel, 0, 1);
         }
 
         void SetLanguage(string language)
@@ -126,7 +164,8 @@ namespace _2dboard
             }
         }
 
-        void SetupTableLayout(TableLayoutPanel mainLayout) {
+        void SetupTableLayout(TableLayoutPanel mainLayout) 
+        {
             mainLayout.Dock = DockStyle.Fill;
             mainLayout.RowCount = 4;
             mainLayout.ColumnCount = 1;
@@ -136,6 +175,10 @@ namespace _2dboard
             mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // Footer
 
             Controls.Add(mainLayout);
+        }
+
+        void changeSelectedMouse(DraggableCanvas canvas, String selectedMouse) {
+            canvas.selectedMouse = selectedMouse;
         }
     }
 }
