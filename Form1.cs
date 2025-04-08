@@ -24,7 +24,7 @@ namespace _2dboard
 
             //Default base values
             Text = rm.GetString("AppTitle");
-            Size = new Size(300, 200);
+            Size = new Size(800, 500);
 
             //Menu and ToolStrip
             MenuStrip menuStrip = new MenuStrip();
@@ -80,7 +80,7 @@ namespace _2dboard
 
             contentPanel.Controls.Add(contentLayout);
 
-            DraggableCanvas canvas = new DraggableCanvas
+            DrawingCanvas canvas = new DrawingCanvas
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.Black
@@ -110,10 +110,11 @@ namespace _2dboard
             };
 
             // Buttons
+            Size BUTTON_SIZE = new Size(15,15);
                 //Select Button
             Button selectButton = new Button
             {
-                Size = new Size(15,15),
+                Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Red
             };
@@ -128,7 +129,7 @@ namespace _2dboard
                 //Move Button
             Button moveButton = new Button
             {
-                Size = new Size(15,15),
+                Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.Black
             };
@@ -139,6 +140,21 @@ namespace _2dboard
             };
 
             menuPanel.Controls.Add(moveButton);
+
+                //Line Button
+            Button lineButton = new Button
+            {
+                Size = BUTTON_SIZE,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Blue
+            };
+
+            lineButton.Click += (sender, e) => {
+                changeSelectedMouse(canvas, "Line");
+                canvas.Cursor = Cursors.UpArrow;
+            };
+
+            menuPanel.Controls.Add(lineButton);
 
             //Temp iteration to visualize buttons location
             for (int i = 0; i < 5; i++)
@@ -177,7 +193,7 @@ namespace _2dboard
             Controls.Add(mainLayout);
         }
 
-        void changeSelectedMouse(DraggableCanvas canvas, String selectedMouse) {
+        void changeSelectedMouse(DrawingCanvas canvas, String selectedMouse) {
             canvas.selectedMouse = selectedMouse;
         }
     }
