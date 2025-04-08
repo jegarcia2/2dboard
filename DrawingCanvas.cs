@@ -6,7 +6,9 @@ class DrawingCanvas : Panel
     public String selectedMouse = "Select";
     public new Point MousePosition = new Point(0,0);
     private Point? tempStartPoint = null;
-    private List<(Point Start, Point End)> lines = new List<(Point, Point)>();
+    private List<(Point Start, Point End, Color color)> lines = new List<(Point, Point, Color)>();
+
+    public Color selectedColor = Color.White;
 
     public DrawingCanvas()
     {
@@ -30,16 +32,25 @@ class DrawingCanvas : Panel
 
         foreach (var line in lines)
         {
+            Pen LinePen = new Pen(line.color,2);
             Point p1 = new Point(centerPoint.X + line.Start.X, centerPoint.Y - line.Start.Y);
             Point p2 = new Point(centerPoint.X + line.End.X, centerPoint.Y - line.End.Y);
-            g.DrawLine(Pens.White, p1, p2);
+            g.DrawLine(LinePen, p1, p2);
+            LinePen.Dispose();
         }
 
         // Optional: draw preview line from tempStartPoint to current mouse
         if (selectedMouse == "Line" && tempStartPoint.HasValue)
         {
+            Pen TempLinePen = new Pen(selectedColor, 1);
             Point currentPos = GetRelativeCoordinates(this.PointToClient(Cursor.Position));
-            g.DrawLine(Pens.Gray, tempStartPoint.Value, currentPos);
+
+            // Convert back to canvas coordinates for drawing
+            Point drawStart = new Point(tempStartPoint.Value.X + centerPoint.X, centerPoint.Y - tempStartPoint.Value.Y);
+            Point drawEnd = new Point(currentPos.X + centerPoint.X, centerPoint.Y - currentPos.Y);
+
+            g.DrawLine(TempLinePen, drawStart, drawEnd);
+            TempLinePen.Dispose();
         }
     }
     private void Canvas_MouseDown( object sender, MouseEventArgs e )
@@ -52,13 +63,14 @@ class DrawingCanvas : Panel
             if (tempStartPoint == null)
             {
                 // First click - save start point
+
                 tempStartPoint = clickedPoint;
-                drawLine();
+
             }
             else
             {
                 // Second click - save line and reset
-                lines.Add((tempStartPoint.Value, clickedPoint));
+                lines.Add((tempStartPoint.Value, clickedPoint, selectedColor));
                 tempStartPoint = null;
                 this.Invalidate(); // Trigger redraw
             }
@@ -87,16 +99,14 @@ class DrawingCanvas : Panel
             lastMousePosition = e.Location;
 
             this.Invalidate(); // Redraw canvas
+        } else if ( selectedMouse == "Line" && tempStartPoint.HasValue ) {
+            this.Invalidate(); // Redraw canvas
         }
-
     }
 
     private Point GetRelativeCoordinates(Point location)
     {
-        return new Point(location.X - centerPoint.X, -(location.Y - centerPoint.Y));
+        return new Point(location.X - centerPoint.X,  centerPoint.Y - location.Y);
     }
 
-    private void drawLine() {
-
-    }
 }

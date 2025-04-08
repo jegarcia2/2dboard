@@ -157,7 +157,7 @@ namespace _2dboard
             menuPanel.Controls.Add(lineButton);
 
             //Temp iteration to visualize buttons location
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 3; i++)
             {
                 Button btn = new Button();
                 btn.Size = new Size(10, 10); 
@@ -166,7 +166,24 @@ namespace _2dboard
                 menuPanel.Controls.Add(btn);
             }
 
+            ComboBox colorSelector = new ComboBox
+            {
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Width = 100
+            };
+
+
+            colorSelector.Items.AddRange(new object[] { "Black", "Red", "Green", "Blue", "Yellow" });
+            colorSelector.SelectedIndex = 0; // Default color
+            colorSelector.SelectedIndexChanged  += (sender, e) => {
+                string selectedColorName = colorSelector.SelectedItem.ToString();
+                canvas.selectedColor = Color.FromName(selectedColorName);
+            };
+
+            menuPanel.Controls.Add(colorSelector);
+
             mainLayout.Controls.Add(menuPanel, 0, 1);
+
         }
 
         void SetLanguage(string language)
