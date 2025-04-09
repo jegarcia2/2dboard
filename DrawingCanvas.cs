@@ -2,11 +2,14 @@ class DrawingCanvas : Panel
 {
     public Point centerPoint;
     private bool isDragging = false;
+    private bool isErasing = false;
     private Point lastMousePosition;
     public String selectedMouse = "Select";
     public new Point MousePosition = new Point(0,0);
     private Point? tempStartPoint = null;
     private List<(Point Start, Point End, Color color)> lines = new List<(Point, Point, Color)>();
+
+    public event Action<string>? OnUpdateSidePanel;
 
     public Color selectedColor = Color.White;
 
@@ -55,32 +58,44 @@ class DrawingCanvas : Panel
     }
     private void Canvas_MouseDown( object sender, MouseEventArgs e )
     {
+
         Point clickedPoint = GetRelativeCoordinates(e.Location);
 
-        if (selectedMouse == "Move") {
-            isDragging = true;
-        } else if ( selectedMouse == "Line" ) {
-            if (tempStartPoint == null)
-            {
-                // First click - save start point
+        switch ( selectedMouse )
+        {
+            case "Move":
+                isDragging = true;
+                break;
 
-                tempStartPoint = clickedPoint;
+            case "Line":
+                if (tempStartPoint == null)
+                {
+                    // First click - save start point
+                    tempStartPoint = clickedPoint;
 
-            }
-            else
-            {
-                // Second click - save line and reset
-                lines.Add((tempStartPoint.Value, clickedPoint, selectedColor));
-                tempStartPoint = null;
-                this.Invalidate(); // Trigger redraw
-            }
+                }
+                else
+                {
+                    // Second click - save line and reset
+                    lines.Add((tempStartPoint.Value, clickedPoint, selectedColor));
+                    tempStartPoint = null;
+                    this.Invalidate(); // Trigger redraw
+                }
+                break;
+
+            case "Eraser":
+                TryEraseAt(e.Location);
+                isErasing = true;
+                break;
         }
+
         lastMousePosition = e.Location;
     }
 
     private void Canvas_MouseUp( object sender, MouseEventArgs e )
     {
         isDragging = false;
+        isErasing = false;
         if (selectedMouse == "Move") {
             Cursor = Cursors.Hand;
         } else {
@@ -102,11 +117,67 @@ class DrawingCanvas : Panel
         } else if ( selectedMouse == "Line" && tempStartPoint.HasValue ) {
             this.Invalidate(); // Redraw canvas
         }
+        else if ( isErasing ) {
+            TryEraseAt(e.Location, true);
+        }
     }
 
     private Point GetRelativeCoordinates(Point location)
     {
         return new Point(location.X - centerPoint.X,  centerPoint.Y - location.Y);
+    }
+
+    private void TryEraseAt(Point mousePos, Boolean Continuous = false)
+    {
+        Point relativePos = GetRelativeCoordinates(mousePos);
+
+        for (int i = lines.Count - 1; i >= 0; i--)
+        {
+            var line = lines[i];
+
+            if (IsPointNearLine(relativePos, line.Start, line.End))
+            {
+                lines.RemoveAt(i);
+                Invalidate(); // Triggers a redraw
+                if (!Continuous) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private bool IsPointNearLine(Point p, Point a, Point b, int threshold = 5)
+    {
+        float distance = DistanceFromPointToLine(p, a, b);
+        return distance <= threshold;
+    }
+
+    private float DistanceFromPointToLine(Point p, Point a, Point b)
+    {
+        float dx = b.X - a.X;
+        float dy = b.Y - a.Y;
+
+        if (dx == 0 && dy == 0)
+            return Distance(p, a);
+
+        float t = ((p.X - a.X) * dx + (p.Y - a.Y) * dy) / (dx * dx + dy * dy);
+        t = Math.Max(0, Math.Min(1, t));
+
+        float projX = a.X + t * dx;
+        float projY = a.Y + t * dy;
+
+        return Distance(p, new Point((int)projX, (int)projY));
+    }
+
+    private float Distance(Point p1, Point p2)
+    {
+        return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+    }
+
+
+    private void SomeAction()
+    {
+        OnUpdateSidePanel?.Invoke("New text from canvas!");
     }
 
 }

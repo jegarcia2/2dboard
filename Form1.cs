@@ -65,7 +65,17 @@ namespace _2dboard
 
             mainLayout.Controls.Add(footerLabel, 0, 3);
 
+
+            //SidePanel
+
+            Panel sidePanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = Color.LightGray
+            };
+
             // Drawing Canvas
+
             Panel contentPanel = new Panel();
             contentPanel.Dock = DockStyle.Fill;
             mainLayout.Controls.Add(contentPanel, 0, 2);
@@ -91,17 +101,14 @@ namespace _2dboard
                 footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
             };
 
-            //SidePanel
-
-            Panel sidePanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.LightGray
+            canvas.OnUpdateSidePanel += (text) => {
+                sidePanel.Controls.Clear();
+                sidePanel.Controls.Add(new Label { Text = text, AutoSize = true });
             };
 
             contentLayout.Controls.Add(canvas, 0, 0);
             contentLayout.Controls.Add(sidePanel, 1, 0);
-
+            
             //Flow Layout (Upper buttons)
             FlowLayoutPanel menuPanel = new FlowLayoutPanel {
                 Height = 50,
@@ -156,6 +163,21 @@ namespace _2dboard
 
             menuPanel.Controls.Add(lineButton);
 
+                //Eraser Button
+            Button eraserButton = new Button
+            {
+                Size = BUTTON_SIZE,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Purple
+            };
+
+            eraserButton.Click += (sender, e) => {
+                changeSelectedMouse(canvas, "Eraser");
+                canvas.Cursor = Cursors.UpArrow;
+            };
+
+            menuPanel.Controls.Add(eraserButton);
+
             //Temp iteration to visualize buttons location
             for (int i = 0; i < 3; i++)
             {
@@ -171,7 +193,6 @@ namespace _2dboard
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Width = 100
             };
-
 
             colorSelector.Items.AddRange(new object[] { "Black", "Red", "Green", "Blue", "Yellow" });
             colorSelector.SelectedIndex = 0; // Default color
