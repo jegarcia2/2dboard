@@ -5,11 +5,14 @@ class DrawingCanvas : Panel
     private bool isErasing = false;
     private Point lastMousePosition;
     public String selectedMouse = "Select";
-    public new Point MousePosition = new Point(0,0);
+    public new Point MousePosition = new Point(0, 0);
     private Point? tempStartPoint = null;
-    private List<(Point Start, Point End, Color color)> lines = new List<(Point, Point, Color)>();
+    public List<(Point Start, Point End, Color color)> lines = new List<(Point, Point, Color)>();
+    public object selectedLine;
+    public int selectedLineIndex = -1; 
 
-    public event Action<string>? OnUpdateSidePanel;
+public event Action<SidePanelData>? OnUpdateSidePanel;
+
 
     public Color selectedColor = Color.White;
 
@@ -30,12 +33,11 @@ class DrawingCanvas : Panel
         Pen axisPen = new Pen(Color.White, 2);
 
         g.DrawLine(axisPen, new Point(0, centerPoint.Y), new Point(this.Width, centerPoint.Y));
-
         g.DrawLine(axisPen, new Point(centerPoint.X, 0), new Point(centerPoint.X, this.Height));
 
         foreach (var line in lines)
         {
-            Pen LinePen = new Pen(line.color,2);
+            Pen LinePen = new Pen(line.color, 2);
             Point p1 = new Point(centerPoint.X + line.Start.X, centerPoint.Y - line.Start.Y);
             Point p2 = new Point(centerPoint.X + line.End.X, centerPoint.Y - line.End.Y);
             g.DrawLine(LinePen, p1, p2);
@@ -56,13 +58,17 @@ class DrawingCanvas : Panel
             TempLinePen.Dispose();
         }
     }
-    private void Canvas_MouseDown( object sender, MouseEventArgs e )
-    {
 
+    private void Canvas_MouseDown(object sender, MouseEventArgs e)
+    {
         Point clickedPoint = GetRelativeCoordinates(e.Location);
 
-        switch ( selectedMouse )
+        switch (selectedMouse)
         {
+            case "Select":
+                SelectElement(e.Location);
+                break;
+
             case "Move":
                 isDragging = true;
                 break;
@@ -72,7 +78,6 @@ class DrawingCanvas : Panel
                 {
                     // First click - save start point
                     tempStartPoint = clickedPoint;
-
                 }
                 else
                 {
@@ -92,20 +97,23 @@ class DrawingCanvas : Panel
         lastMousePosition = e.Location;
     }
 
-    private void Canvas_MouseUp( object sender, MouseEventArgs e )
+    private void Canvas_MouseUp(object sender, MouseEventArgs e)
     {
         isDragging = false;
         isErasing = false;
-        if (selectedMouse == "Move") {
+        if (selectedMouse == "Move")
+        {
             Cursor = Cursors.Hand;
-        } else {
+        }
+        else
+        {
             Cursor = Cursors.Default;
         }
     }
 
-    private void Canvas_MouseMove( object sender, MouseEventArgs e )
+    private void Canvas_MouseMove(object sender, MouseEventArgs e)
     {
-        if ( isDragging )
+        if (isDragging)
         {
             Cursor = Cursors.SizeAll;
             // Move the center point
@@ -114,20 +122,23 @@ class DrawingCanvas : Panel
             lastMousePosition = e.Location;
 
             this.Invalidate(); // Redraw canvas
-        } else if ( selectedMouse == "Line" && tempStartPoint.HasValue ) {
+        }
+        else if (selectedMouse == "Line" && tempStartPoint.HasValue)
+        {
             this.Invalidate(); // Redraw canvas
         }
-        else if ( isErasing ) {
+        else if (isErasing)
+        {
             TryEraseAt(e.Location, true);
         }
     }
 
     private Point GetRelativeCoordinates(Point location)
     {
-        return new Point(location.X - centerPoint.X,  centerPoint.Y - location.Y);
+        return new Point(location.X - centerPoint.X, centerPoint.Y - location.Y);
     }
 
-    private void TryEraseAt(Point mousePos, Boolean Continuous = false)
+    private void TryEraseAt(Point mousePos, bool Continuous = false)
     {
         Point relativePos = GetRelativeCoordinates(mousePos);
 
@@ -139,7 +150,8 @@ class DrawingCanvas : Panel
             {
                 lines.RemoveAt(i);
                 Invalidate(); // Triggers a redraw
-                if (!Continuous) {
+                if (!Continuous)
+                {
                     break;
                 }
             }
@@ -169,15 +181,58 @@ class DrawingCanvas : Panel
         return Distance(p, new Point((int)projX, (int)projY));
     }
 
+    private void SelectElement(Point mousePos)
+    {
+        Point relativePos = GetRelativeCoordinates(mousePos);
+        for (int i = lines.Count - 1; i >= 0; i--)
+        {
+            var line = lines[i];
+
+            if (IsPointNearLine(relativePos, line.Start, line.End))
+            {
+                selectedLine = line; // Use the tuple directly
+                selectedLineIndex = i;
+                ThrowInformationToSidePanel(selectedLine); // Display the information
+                Invalidate(); // Triggers a redraw
+            }
+        }
+    }
+
     private float Distance(Point p1, Point p2)
     {
         return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
     }
 
+private void ThrowInformationToSidePanel(Object selectedLine)
+{
+    // Unbox the selected line from the object
+    var line = (ValueTuple<Point, Point, Color>)selectedLine;
 
-    private void SomeAction()
+    // Calculate the length of the line
+    double length = Distance(line.Item1, line.Item2);
+
+    // Prepare side panel data
+    SidePanelData panelData = new SidePanelData
     {
-        OnUpdateSidePanel?.Invoke("New text from canvas!");
-    }
+        Length = $"{length:F2}",
+        Point1X = $"{line.Item1.X}",
+        Point1Y = $"{line.Item1.Y}",
+        Point2X = $"{line.Item2.X}",
+        Point2Y = $"{line.Item2.Y}",
+        Color = line.Item3.Name
+    };
 
+    // Trigger the event to update the side panel with editable fields
+    OnUpdateSidePanel?.Invoke(panelData);
+}
+
+    public void cancelLine()
+    {
+        if (tempStartPoint.HasValue)
+        {
+            // Reset drawing state
+            tempStartPoint = null;
+            this.Invalidate(); // Trigger a redraw
+        }
+    }
 }

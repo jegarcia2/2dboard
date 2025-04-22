@@ -11,6 +11,10 @@ namespace _2dboard
         ResourceManager rm;
         AppSettings settings = AppSettings.LoadSettings();
 
+        DrawingCanvas canvas;
+        Panel sidePanel;
+        string[] colors = new String[] { "White", "Red", "Green", "Blue", "Yellow" };
+
         public Form1()
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
@@ -68,7 +72,7 @@ namespace _2dboard
 
             //SidePanel
 
-            Panel sidePanel = new Panel
+            sidePanel = new Panel
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.LightGray
@@ -90,7 +94,7 @@ namespace _2dboard
 
             contentPanel.Controls.Add(contentLayout);
 
-            DrawingCanvas canvas = new DrawingCanvas
+            canvas = new DrawingCanvas
             {
                 Dock = DockStyle.Fill,
                 BackColor = Color.Black
@@ -101,10 +105,7 @@ namespace _2dboard
                 footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
             };
 
-            canvas.OnUpdateSidePanel += (text) => {
-                sidePanel.Controls.Clear();
-                sidePanel.Controls.Add(new Label { Text = text, AutoSize = true });
-            };
+            canvas.OnUpdateSidePanel += UpdateSidePanel;
 
             contentLayout.Controls.Add(canvas, 0, 0);
             contentLayout.Controls.Add(sidePanel, 1, 0);
@@ -194,7 +195,7 @@ namespace _2dboard
                 Width = 100
             };
 
-            colorSelector.Items.AddRange(new object[] { "Black", "Red", "Green", "Blue", "Yellow" });
+            colorSelector.Items.AddRange(colors);
             colorSelector.SelectedIndex = 0; // Default color
             colorSelector.SelectedIndexChanged  += (sender, e) => {
                 string selectedColorName = colorSelector.SelectedItem.ToString();
@@ -233,6 +234,149 @@ namespace _2dboard
 
         void changeSelectedMouse(DrawingCanvas canvas, String selectedMouse) {
             canvas.selectedMouse = selectedMouse;
+        }
+    
+        // Event handler to update the side panel
+    private void UpdateSidePanel(SidePanelData panelData)
+    {
+        // Clear previous controls
+        sidePanel.Controls.Clear();
+
+        // Create and add editable fields to the side panel
+            // Length label and textbox
+        Label lengthLabel = new Label
+        {
+            Text = "Length:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        TextBox lengthTextBox = new TextBox
+        {
+            Text = panelData.Length,
+            Dock = DockStyle.Top
+        };
+
+        // Point 1 X label and textbox
+        Label point1XLabel = new Label
+        {
+            Text = "Point 1 X:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        TextBox point1XTextBox = new TextBox
+        {
+            Text = panelData.Point1X,
+            Dock = DockStyle.Top
+        };
+
+        Label point1YLabel = new Label
+        {
+            Text = "Point 1 Y:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        TextBox point1YTextBox = new TextBox
+        {
+            Text = panelData.Point1Y,
+            Dock = DockStyle.Top
+        };
+
+        // Point 2 X label and textbox
+        Label point2XLabel = new Label
+        {
+            Text = "Point 2 X:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        TextBox point2XTextBox = new TextBox
+        {
+            Text = panelData.Point2X,
+            Dock = DockStyle.Top
+        };
+
+        // Point 2 Y label and textbox
+        Label point2YLabel = new Label
+        {
+            Text = "Point 2 Y:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+        TextBox point2YTextBox = new TextBox
+        {
+            Text = panelData.Point2Y,
+            Dock = DockStyle.Top
+        };
+
+        // Color label and textbox
+        Label colorLabel = new Label
+        {
+            Text = "Color:",
+            Dock = DockStyle.Top,
+            TextAlign = ContentAlignment.MiddleLeft
+        };
+
+        // Create ComboBox for color selection
+        ComboBox colorComboBox = new ComboBox
+        {
+            Dock = DockStyle.Top,
+            DataSource = colors, // Bind to the color array
+            Text = panelData.Color // Set the initial selected color
+        };
+
+        // Add event handler for color selection
+        colorComboBox.SelectedIndexChanged += (sender, e) =>
+        {
+            // Update the line color when a new color is selected
+            var selectedColor = Color.FromName(colorComboBox.SelectedItem.ToString());
+            // Update the line's color with the selected color (you can add your logic for this)
+            UpdateLineColor(selectedColor); // Method that will handle the update (to be implemented)
+            Invalidate(); // Trigger a redraw
+        };
+
+        // Optionally, add event handlers to update line data when values are changed
+        // For example, update `drawingCanvas`'s line data when the user edits the fields
+        // Add labels and textboxes to the panel in the correct order
+        sidePanel.Controls.Add(lengthTextBox);
+        sidePanel.Controls.Add(lengthLabel); 
+
+        sidePanel.Controls.Add(point2YTextBox);
+        sidePanel.Controls.Add(point2YLabel);
+
+        sidePanel.Controls.Add(point2XTextBox);
+        sidePanel.Controls.Add(point2XLabel);
+
+        sidePanel.Controls.Add(point1YTextBox);
+        sidePanel.Controls.Add(point1YLabel);
+
+        sidePanel.Controls.Add(point1XTextBox);
+        sidePanel.Controls.Add(point1XLabel);
+
+        sidePanel.Controls.Add(colorComboBox);
+        sidePanel.Controls.Add(colorLabel);
+    }
+
+    private void UpdateLineColor(Color newColor)
+    {
+        var lines = canvas.lines;
+        int selectedLineIndex = canvas.selectedLineIndex; 
+        if (selectedLineIndex >= 0 && selectedLineIndex < lines.Count)
+        {
+            var line = lines[selectedLineIndex];
+            lines[selectedLineIndex] = (line.Item1, line.Item2, newColor); // Update color of the selected line
+            Invalidate(); // Trigger a redraw
+        }
+    }
+
+        // Override ProcessCmdKey to capture Esc key press
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Escape)
+            {
+                // Call cancelLine in DrawingCanvas to cancel the line drawing
+                canvas.cancelLine();
+                return true; // Return true to indicate the key press was handled
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
     }
 }
