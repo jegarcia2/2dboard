@@ -6,4 +6,6 @@ public class SidePanelData
     public string Point2X { get; set; }
     public string Point2Y { get; set; }
     public string Color { get; set; }
+    public string Diameter { get; set; } // For Circle
+    public string Perimeter { get; set; } // For Circle
 }

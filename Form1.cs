@@ -18,6 +18,7 @@ namespace _2dboard
         public Form1()
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+            Icon = new Icon("Resources/TEMP.ico");  // Set the form icon
             //Creating Language Handler
             CultureInfo.CurrentUICulture = new CultureInfo(settings.Language);
             rm = new ResourceManager("_2dboard.Resources.Strings", typeof(Form1).Assembly);
@@ -33,14 +34,14 @@ namespace _2dboard
             //Menu and ToolStrip
             MenuStrip menuStrip = new MenuStrip();
 
-                //Options Menu
+            //Options Menu
             ToolStripMenuItem optionsMenu = new ToolStripMenuItem(rm.GetString("MenuOptions"));
             optionsMenu.DropDownItems.Add("Settings", null, (sender, e) => MessageBox.Show("Opening Settings..."));
             optionsMenu.DropDownItems.Add("Help", null, (sender, e) => MessageBox.Show("Showing Help..."));
             optionsMenu.DropDownItems.Add("Exit", null, (sender, e) => this.Close());
             menuStrip.Items.Add(optionsMenu);
 
-                //Language Menu
+            //Language Menu
             ToolStripMenuItem languageMenu = new ToolStripMenuItem(rm.GetString("MenuLanguage"));
             languageMenu.DropDownItems.Add("Español", null, (sender, e) => SetLanguage("es"));
             languageMenu.DropDownItems.Add("English", null, (sender, e) => SetLanguage("en"));
@@ -50,24 +51,65 @@ namespace _2dboard
 
             mainLayout.Controls.Add(menuStrip, 0, 0);
 
-            //Footer
+            // Footer Panel where the buttons will go
             Panel footerPanel = new Panel
             {
                 Height = 30,
-                Dock = DockStyle.Fill, 
+                Dock = DockStyle.Fill,
                 BackColor = Color.LightGray
-            }; 
+            };
 
+            // Footer Label
             Label footerLabel = new Label
             {
                 Text = $"{rm.GetString("Coordinates")} - X: 0 Y: 0",
                 AutoSize = true,
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
-
             footerPanel.Controls.Add(footerLabel);
 
-            mainLayout.Controls.Add(footerLabel, 0, 3);
+            // Add Corner Buttons (Grid On/Off and Center Canvas) to the right corner
+            FlowLayoutPanel footerButtonPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Right,
+                FlowDirection = FlowDirection.LeftToRight,
+                Width = 150  // Adjust the width for button space
+            };
+
+            // Grid Button
+            Button gridButton = new Button
+            {
+                Size = new Size(25, 25),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Green,
+                Text = "Grid",
+                Font = new Font("Arial", 6)  // Small font size for the button
+            };
+            gridButton.Click += (sender, e) =>
+            {
+                canvas.ToggleGrid(); // Toggle grid visibility
+                canvas.Invalidate(); // Redraw the canvas with or without grid
+            };
+            footerButtonPanel.Controls.Add(gridButton);
+
+            // Center Canvas Button
+            Button centerButton = new Button
+            {
+                Size = new Size(25, 25),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Blue,
+                Text = "Center",
+                Font = new Font("Arial", 6)  // Small font size for the button
+            };
+            centerButton.Click += (sender, e) =>
+            {
+                canvas.CenterCanvas(); // Animate the canvas to the center
+            };
+            footerButtonPanel.Controls.Add(centerButton);
+
+            // Add the footer button panel to the footer
+            footerPanel.Controls.Add(footerButtonPanel);
+            mainLayout.Controls.Add(footerPanel, 0, 3);
 
 
             //SidePanel
@@ -100,7 +142,7 @@ namespace _2dboard
                 BackColor = Color.Black
             };
 
-            canvas.MouseMove += (sender, e) => 
+            canvas.MouseMove += (sender, e) =>
             {
                 footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
             };
@@ -109,32 +151,35 @@ namespace _2dboard
 
             contentLayout.Controls.Add(canvas, 0, 0);
             contentLayout.Controls.Add(sidePanel, 1, 0);
-            
+
             //Flow Layout (Upper buttons)
-            FlowLayoutPanel menuPanel = new FlowLayoutPanel {
+            FlowLayoutPanel menuPanel = new FlowLayoutPanel
+            {
                 Height = 50,
                 AutoSize = true,
                 FlowDirection = FlowDirection.LeftToRight,
             };
 
             // Buttons
-            Size BUTTON_SIZE = new Size(15,15);
-                //Select Button
+            Size BUTTON_SIZE = new Size(25, 25);
+            //Select Button
             Button selectButton = new Button
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Red
+                BackColor = Color.Red,
+                Image = Image.FromFile("Resources/TEMP.ico"), // Set the custom icon
             };
 
-            selectButton.Click += (sender, e) => {
+            selectButton.Click += (sender, e) =>
+            {
                 changeSelectedMouse(canvas, "Select");
-                canvas.Cursor = Cursors.Default;                
+                canvas.Cursor = Cursors.Default;
             };
 
             menuPanel.Controls.Add(selectButton);
 
-                //Move Button
+            //Move Button
             Button moveButton = new Button
             {
                 Size = BUTTON_SIZE,
@@ -142,14 +187,15 @@ namespace _2dboard
                 BackColor = Color.Black
             };
 
-            moveButton.Click += (sender, e) => {
+            moveButton.Click += (sender, e) =>
+            {
                 changeSelectedMouse(canvas, "Move");
                 canvas.Cursor = Cursors.Hand;
             };
 
             menuPanel.Controls.Add(moveButton);
 
-                //Line Button
+            //Line Button
             Button lineButton = new Button
             {
                 Size = BUTTON_SIZE,
@@ -157,14 +203,14 @@ namespace _2dboard
                 BackColor = Color.Blue
             };
 
-            lineButton.Click += (sender, e) => {
+            lineButton.Click += (sender, e) =>
+            {
                 changeSelectedMouse(canvas, "Line");
-                canvas.Cursor = Cursors.UpArrow;
             };
 
             menuPanel.Controls.Add(lineButton);
 
-                //Eraser Button
+            //Eraser Button
             Button eraserButton = new Button
             {
                 Size = BUTTON_SIZE,
@@ -172,22 +218,30 @@ namespace _2dboard
                 BackColor = Color.Purple
             };
 
-            eraserButton.Click += (sender, e) => {
+            eraserButton.Click += (sender, e) =>
+            {
                 changeSelectedMouse(canvas, "Eraser");
-                canvas.Cursor = Cursors.UpArrow;
             };
 
             menuPanel.Controls.Add(eraserButton);
 
-            //Temp iteration to visualize buttons location
-            for (int i = 0; i < 3; i++)
+            // Circle Button
+            Button circleButton = new Button
             {
-                Button btn = new Button();
-                btn.Size = new Size(10, 10); 
-                btn.FlatStyle = FlatStyle.Flat;
-                btn.BackgroundImageLayout = ImageLayout.Zoom;
-                menuPanel.Controls.Add(btn);
-            }
+                Size = BUTTON_SIZE,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Orange  // Choose a color for the circle button
+            };
+
+            circleButton.Click += (sender, e) =>
+            {
+                changeSelectedMouse(canvas, "Circle");
+                canvas.Cursor = Cursors.Cross;  // Set cursor to crosshair for drawing circles
+            };
+
+            menuPanel.Controls.Add(circleButton);
+
+            //Color Selector
 
             ComboBox colorSelector = new ComboBox
             {
@@ -197,7 +251,8 @@ namespace _2dboard
 
             colorSelector.Items.AddRange(colors);
             colorSelector.SelectedIndex = 0; // Default color
-            colorSelector.SelectedIndexChanged  += (sender, e) => {
+            colorSelector.SelectedIndexChanged += (sender, e) =>
+            {
                 string selectedColorName = colorSelector.SelectedItem.ToString();
                 canvas.selectedColor = Color.FromName(selectedColorName);
             };
@@ -205,13 +260,13 @@ namespace _2dboard
             menuPanel.Controls.Add(colorSelector);
 
             mainLayout.Controls.Add(menuPanel, 0, 1);
-
         }
 
         void SetLanguage(string language)
         {
             DialogResult dialogResult = MessageBox.Show(rm.GetString("ChangeLanguageText"), rm.GetString("YesNoMenuTitle"), MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes) {
+            if (dialogResult == DialogResult.Yes)
+            {
                 settings.Language = language;
                 settings.SaveSettings();
                 Application.Restart();
@@ -219,7 +274,7 @@ namespace _2dboard
             }
         }
 
-        void SetupTableLayout(TableLayoutPanel mainLayout) 
+        void SetupTableLayout(TableLayoutPanel mainLayout)
         {
             mainLayout.Dock = DockStyle.Fill;
             mainLayout.RowCount = 4;
@@ -232,140 +287,153 @@ namespace _2dboard
             Controls.Add(mainLayout);
         }
 
-        void changeSelectedMouse(DrawingCanvas canvas, String selectedMouse) {
+        void changeSelectedMouse(DrawingCanvas canvas, String selectedMouse)
+        {
             canvas.selectedMouse = selectedMouse;
         }
-    
+
         // Event handler to update the side panel
-    private void UpdateSidePanel(SidePanelData panelData)
-    {
-        // Clear previous controls
-        sidePanel.Controls.Clear();
+        private void UpdateSidePanel(SidePanelData panelData)
+        {
+            // Clear previous controls
+            sidePanel.Controls.Clear();
 
-        // Create and add editable fields to the side panel
+            // Create and add editable fields to the side panel
             // Length label and textbox
-        Label lengthLabel = new Label
-        {
-            Text = "Length:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-        TextBox lengthTextBox = new TextBox
-        {
-            Text = panelData.Length,
-            Dock = DockStyle.Top
-        };
+            Label lengthLabel = new Label
+            {
+                Text = "Length:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            TextBox lengthTextBox = new TextBox
+            {
+                Text = panelData.Length,
+                Dock = DockStyle.Top
+            };
 
-        // Point 1 X label and textbox
-        Label point1XLabel = new Label
-        {
-            Text = "Point 1 X:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-        TextBox point1XTextBox = new TextBox
-        {
-            Text = panelData.Point1X,
-            Dock = DockStyle.Top
-        };
+            // Point 1 X label and textbox
+            Label point1XLabel = new Label
+            {
+                Text = "Point 1 X:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            TextBox point1XTextBox = new TextBox
+            {
+                Text = panelData.Point1X,
+                Dock = DockStyle.Top
+            };
 
-        Label point1YLabel = new Label
-        {
-            Text = "Point 1 Y:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-        TextBox point1YTextBox = new TextBox
-        {
-            Text = panelData.Point1Y,
-            Dock = DockStyle.Top
-        };
+            Label point1YLabel = new Label
+            {
+                Text = "Point 1 Y:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            TextBox point1YTextBox = new TextBox
+            {
+                Text = panelData.Point1Y,
+                Dock = DockStyle.Top
+            };
 
-        // Point 2 X label and textbox
-        Label point2XLabel = new Label
-        {
-            Text = "Point 2 X:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-        TextBox point2XTextBox = new TextBox
-        {
-            Text = panelData.Point2X,
-            Dock = DockStyle.Top
-        };
+            // Point 2 X label and textbox
+            Label point2XLabel = new Label
+            {
+                Text = "Point 2 X:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            TextBox point2XTextBox = new TextBox
+            {
+                Text = panelData.Point2X,
+                Dock = DockStyle.Top
+            };
 
-        // Point 2 Y label and textbox
-        Label point2YLabel = new Label
-        {
-            Text = "Point 2 Y:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
-        TextBox point2YTextBox = new TextBox
-        {
-            Text = panelData.Point2Y,
-            Dock = DockStyle.Top
-        };
+            // Point 2 Y label and textbox
+            Label point2YLabel = new Label
+            {
+                Text = "Point 2 Y:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+            TextBox point2YTextBox = new TextBox
+            {
+                Text = panelData.Point2Y,
+                Dock = DockStyle.Top
+            };
 
-        // Color label and textbox
-        Label colorLabel = new Label
-        {
-            Text = "Color:",
-            Dock = DockStyle.Top,
-            TextAlign = ContentAlignment.MiddleLeft
-        };
+            // Color label and textbox
+            Label colorLabel = new Label
+            {
+                Text = "Color:",
+                Dock = DockStyle.Top,
+                TextAlign = ContentAlignment.MiddleLeft
+            };
 
-        // Create ComboBox for color selection
-        ComboBox colorComboBox = new ComboBox
-        {
-            Dock = DockStyle.Top,
-            DataSource = colors, // Bind to the color array
-            Text = panelData.Color // Set the initial selected color
-        };
+            // Create ComboBox for color selection
+            ComboBox colorComboBox = new ComboBox
+            {
+                Dock = DockStyle.Top,
+                DataSource = colors, // Bind to the color array
+                Text = panelData.Color // Set the initial selected color
+            };
 
-        // Add event handler for color selection
-        colorComboBox.SelectedIndexChanged += (sender, e) =>
-        {
-            // Update the line color when a new color is selected
-            var selectedColor = Color.FromName(colorComboBox.SelectedItem.ToString());
-            // Update the line's color with the selected color (you can add your logic for this)
-            UpdateLineColor(selectedColor); // Method that will handle the update (to be implemented)
-            Invalidate(); // Trigger a redraw
-        };
+            // Add event handler for color selection
+            colorComboBox.SelectedIndexChanged += (sender, e) =>
+            {
+                // Update the line color when a new color is selected
+                var selectedColor = Color.FromName(colorComboBox.SelectedItem.ToString());
+                // Update the line's color with the selected color (you can add your logic for this)
+                UpdateShapeColor(selectedColor); // Method that will handle the update (to be implemented)
+                canvas.Invalidate(); // Trigger a redraw
+            };
 
-        // Optionally, add event handlers to update line data when values are changed
-        // For example, update `drawingCanvas`'s line data when the user edits the fields
-        // Add labels and textboxes to the panel in the correct order
-        sidePanel.Controls.Add(lengthTextBox);
-        sidePanel.Controls.Add(lengthLabel); 
+            // Optionally, add event handlers to update line data when values are changed
+            // For example, update `drawingCanvas`'s line data when the user edits the fields
+            // Add labels and textboxes to the panel in the correct order
+            sidePanel.Controls.Add(lengthTextBox);
+            sidePanel.Controls.Add(lengthLabel);
 
-        sidePanel.Controls.Add(point2YTextBox);
-        sidePanel.Controls.Add(point2YLabel);
+            sidePanel.Controls.Add(point2YTextBox);
+            sidePanel.Controls.Add(point2YLabel);
 
-        sidePanel.Controls.Add(point2XTextBox);
-        sidePanel.Controls.Add(point2XLabel);
+            sidePanel.Controls.Add(point2XTextBox);
+            sidePanel.Controls.Add(point2XLabel);
 
-        sidePanel.Controls.Add(point1YTextBox);
-        sidePanel.Controls.Add(point1YLabel);
+            sidePanel.Controls.Add(point1YTextBox);
+            sidePanel.Controls.Add(point1YLabel);
 
-        sidePanel.Controls.Add(point1XTextBox);
-        sidePanel.Controls.Add(point1XLabel);
+            sidePanel.Controls.Add(point1XTextBox);
+            sidePanel.Controls.Add(point1XLabel);
 
-        sidePanel.Controls.Add(colorComboBox);
-        sidePanel.Controls.Add(colorLabel);
-    }
-
-    private void UpdateLineColor(Color newColor)
-    {
-        var lines = canvas.lines;
-        int selectedLineIndex = canvas.selectedLineIndex; 
-        if (selectedLineIndex >= 0 && selectedLineIndex < lines.Count)
-        {
-            var line = lines[selectedLineIndex];
-            lines[selectedLineIndex] = (line.Item1, line.Item2, newColor); // Update color of the selected line
-            Invalidate(); // Trigger a redraw
+            sidePanel.Controls.Add(colorComboBox);
+            sidePanel.Controls.Add(colorLabel);
         }
-    }
+
+        private void UpdateShapeColor(Color newColor)
+        {
+            var shapes = canvas.shapes;  // List of all shapes
+            int selectedShapeIndex = canvas.selectedLineIndex;  // Index of the selected shape
+
+            if (selectedShapeIndex >= 0 && selectedShapeIndex < shapes.Count)
+            {
+                var selectedShape = shapes[selectedShapeIndex];
+
+                // Check the type of shape and update the color
+                if (selectedShape is Line line)
+                {
+                    line.Color = newColor;  // Update color of the Line
+                }
+                else if (selectedShape is Circle circle)
+                {
+                    circle.Color = newColor;  // Update color of the Circle
+                }
+
+                //Invalidate();  // Trigger a redraw to reflect the color change
+            }
+        }
+
 
         // Override ProcessCmdKey to capture Esc key press
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
