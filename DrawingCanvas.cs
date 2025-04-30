@@ -8,8 +8,7 @@ class DrawingCanvas : Panel
     public new Point MousePosition = new Point(0, 0);
     private Point? tempStartPoint = null;
     public List<IShape> shapes = new List<IShape>();
-    public object selectedLine;
-    public int selectedLineIndex = -1;
+    public int selectedIndex = -1;
     public event Action<SidePanelData>? OnUpdateSidePanel;
     private bool showGrid = false;  // Track grid visibility
     private int gridDimension = 30;
@@ -39,7 +38,7 @@ class DrawingCanvas : Panel
         // Draw the grid if it's enabled
         if (showGrid)
         {
-            Pen gridPen = new Pen(Color.Gray, 0.5F);  // Grid line color
+            Pen gridPen = new Pen(Color.FromArgb(45, 45, 45), 0.5F);  // Grid line color
 
             // Vertical lines
             for (int x = centerPoint.X % gridDimension; x < this.Width; x += gridDimension)  // Adjust grid to be centered around centerPoint
@@ -294,30 +293,24 @@ class DrawingCanvas : Panel
     {
         Point relativePos = GetRelativeCoordinates(mousePos);
 
-        // Loop through all shapes and check proximity
-        foreach (var shape in shapes)
+        // Loop through all shapes and check proximity with index tracking
+        for (int i = 0; i < shapes.Count; i++)
         {
-            if (shape is Line line)
+            var shape = shapes[i];
+
+            if (shape is Line line && IsPointNearLine(relativePos, line.Start, line.End))
             {
-                if (IsPointNearLine(relativePos, line.Start, line.End))
-                {
-                    selectedLine = line; // Select the line
-                    selectedLineIndex = shapes.IndexOf(line); // Store its index in the list
-                    ThrowInformationToSidePanel(line); // Display line info
-                    Invalidate(); // Trigger redraw
-                    return; // Exit after selecting the first matched element
-                }
+                selectedIndex = i;
+                ThrowInformationToSidePanel(line);
+                Invalidate();
+                return;
             }
-            else if (shape is Circle circle)
+            else if (shape is Circle circle && IsPointNearCircle(relativePos, circle.Center, circle.Radius))
             {
-                if (IsPointNearCircle(relativePos, circle.Center, circle.Radius))
-                {
-                    selectedLine = circle; // Treat circle selection the same as lines for now
-                    selectedLineIndex = shapes.IndexOf(circle); // Store its index
-                    ThrowInformationToSidePanel(circle); // Display circle info
-                    Invalidate(); // Trigger redraw
-                    return; // Exit after selecting the first matched element
-                }
+                selectedIndex = i;
+                ThrowInformationToSidePanel(circle);
+                Invalidate();
+                return;
             }
         }
     }
@@ -370,7 +363,7 @@ class DrawingCanvas : Panel
             int deltaY = (targetCenter.Y - centerPoint.Y) / 10;
 
             // Stop the animation when the center is close enough to the target
-            if (Math.Abs(targetCenter.X - centerPoint.X) < 2 && Math.Abs(targetCenter.Y - centerPoint.Y) < 2)  // Tolerance of 2 pixels
+            if (Math.Abs(targetCenter.X - centerPoint.X) < 10 && Math.Abs(targetCenter.Y - centerPoint.Y) < 10)  // Tolerance of 2 pixels
             {
                 centerPoint = targetCenter;  // Set centerPoint directly to the target to avoid overshooting
                 animationTimer.Stop(); // Stop the animation timer

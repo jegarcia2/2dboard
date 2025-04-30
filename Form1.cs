@@ -210,21 +210,6 @@ namespace _2dboard
 
             menuPanel.Controls.Add(lineButton);
 
-            //Eraser Button
-            Button eraserButton = new Button
-            {
-                Size = BUTTON_SIZE,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Purple
-            };
-
-            eraserButton.Click += (sender, e) =>
-            {
-                changeSelectedMouse(canvas, "Eraser");
-            };
-
-            menuPanel.Controls.Add(eraserButton);
-
             // Circle Button
             Button circleButton = new Button
             {
@@ -240,6 +225,21 @@ namespace _2dboard
             };
 
             menuPanel.Controls.Add(circleButton);
+
+            //Eraser Button
+            Button eraserButton = new Button
+            {
+                Size = BUTTON_SIZE,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Purple
+            };
+
+            eraserButton.Click += (sender, e) =>
+            {
+                changeSelectedMouse(canvas, "Eraser");
+            };
+
+            menuPanel.Controls.Add(eraserButton);
 
             //Color Selector
 
@@ -376,8 +376,11 @@ namespace _2dboard
             {
                 Dock = DockStyle.Top,
                 DataSource = colors, // Bind to the color array
-                Text = panelData.Color // Set the initial selected color
             };
+
+            colorComboBox.SelectedItem = panelData.Color;
+
+            colorComboBox.SelectedIndex = -1;
 
             // Add event handler for color selection
             colorComboBox.SelectedIndexChanged += (sender, e) =>
@@ -414,23 +417,15 @@ namespace _2dboard
         private void UpdateShapeColor(Color newColor)
         {
             var shapes = canvas.shapes;  // List of all shapes
-            int selectedShapeIndex = canvas.selectedLineIndex;  // Index of the selected shape
+            int selectedShapeIndex = canvas.selectedIndex;  // Index of the selected shape
 
             if (selectedShapeIndex >= 0 && selectedShapeIndex < shapes.Count)
             {
                 var selectedShape = shapes[selectedShapeIndex];
 
-                // Check the type of shape and update the color
-                if (selectedShape is Line line)
-                {
-                    line.Color = newColor;  // Update color of the Line
-                }
-                else if (selectedShape is Circle circle)
-                {
-                    circle.Color = newColor;  // Update color of the Circle
-                }
+                selectedShape.Color = newColor;  // Update color of the Circle
 
-                //Invalidate();  // Trigger a redraw to reflect the color change
+                Invalidate();  // Trigger a redraw to reflect the color change
             }
         }
 
