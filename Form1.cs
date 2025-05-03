@@ -10,7 +10,7 @@ namespace _2dboard
     {
         ResourceManager rm;
         AppSettings settings = AppSettings.LoadSettings();
-
+        private bool isDrawing = false;
         DrawingCanvas canvas;
         Panel sidePanel;
         string[] colors = new String[] { "White", "Red", "Green", "Blue", "Yellow" };
@@ -62,10 +62,11 @@ namespace _2dboard
             // Footer Label
             Label footerLabel = new Label
             {
-                Text = $"{rm.GetString("Coordinates")} - X: 0 Y: 0",
+                Text = $"{rm.GetString("Coordinates")}  X: 0 Y: 0",
                 AutoSize = true,
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left
             };
+
             footerPanel.Controls.Add(footerLabel);
 
             // Add Corner Buttons (Grid On/Off and Center Canvas) to the right corner
@@ -142,9 +143,22 @@ namespace _2dboard
                 BackColor = Color.Black
             };
 
+            canvas.OnTempStartPointChanged += (tempStartPoint) =>
+            {
+                isDrawing = tempStartPoint.HasValue;
+            };
+
             canvas.MouseMove += (sender, e) =>
             {
-                footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
+                if (isDrawing)
+                {
+                    footerLabel.Text = $"{rm.GetString("DrawingMode")} {rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
+
+                }
+                else
+                {
+                    footerLabel.Text = $"{rm.GetString("Coordinates")} - X: {e.Location.X - canvas.centerPoint.X} Y: {canvas.centerPoint.Y - e.Location.Y}";
+                }
             };
 
             canvas.OnUpdateSidePanel += UpdateSidePanel;
@@ -309,7 +323,8 @@ namespace _2dboard
             TextBox lengthTextBox = new TextBox
             {
                 Text = panelData.Length,
-                Dock = DockStyle.Top
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
 
             // Point 1 X label and textbox
@@ -322,7 +337,8 @@ namespace _2dboard
             TextBox point1XTextBox = new TextBox
             {
                 Text = panelData.Point1X,
-                Dock = DockStyle.Top
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
 
             Label point1YLabel = new Label
@@ -334,7 +350,8 @@ namespace _2dboard
             TextBox point1YTextBox = new TextBox
             {
                 Text = panelData.Point1Y,
-                Dock = DockStyle.Top
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
 
             // Point 2 X label and textbox
@@ -347,7 +364,8 @@ namespace _2dboard
             TextBox point2XTextBox = new TextBox
             {
                 Text = panelData.Point2X,
-                Dock = DockStyle.Top
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
 
             // Point 2 Y label and textbox
@@ -360,7 +378,8 @@ namespace _2dboard
             TextBox point2YTextBox = new TextBox
             {
                 Text = panelData.Point2Y,
-                Dock = DockStyle.Top
+                Dock = DockStyle.Top,
+                ReadOnly = true
             };
 
             // Color label and textbox
@@ -377,10 +396,6 @@ namespace _2dboard
                 Dock = DockStyle.Top,
                 DataSource = colors, // Bind to the color array
             };
-
-            colorComboBox.SelectedItem = panelData.Color;
-
-            colorComboBox.SelectedIndex = -1;
 
             // Add event handler for color selection
             colorComboBox.SelectedIndexChanged += (sender, e) =>
@@ -412,6 +427,8 @@ namespace _2dboard
 
             sidePanel.Controls.Add(colorComboBox);
             sidePanel.Controls.Add(colorLabel);
+
+            colorComboBox.SelectedIndex = Array.IndexOf(colors, panelData.Color);
         }
 
         private void UpdateShapeColor(Color newColor)

@@ -36,8 +36,8 @@
     <data name="Coordinates">
     <value>Coordinates</value>
   </data>
-    <data name="">
-    <value></value>
+    <data name="DrawingMode">
+    <value>Drawing Mode. Press ESC to cancel.</value>
   </data>
     <data name="">
     <value></value>

@@ -1,5 +1,6 @@
 class DrawingCanvas : Panel
 {
+    public event Action<Point?> OnTempStartPointChanged;
     public Point centerPoint;
     private bool isDragging = false;
     private bool isErasing = false;
@@ -118,6 +119,7 @@ class DrawingCanvas : Panel
                 {
                     // First click - save start point
                     tempStartPoint = clickedPoint;
+                    OnTempStartPointChanged.Invoke(tempStartPoint);
                 }
                 else
                 {
@@ -130,15 +132,18 @@ class DrawingCanvas : Panel
                     // Second click - save line and reset
                     shapes.Add(line);
                     tempStartPoint = null;
+                    OnTempStartPointChanged.Invoke(tempStartPoint);
                     this.Invalidate(); // Trigger redraw
                 }
                 break;
 
             case "Circle":
+                Cursor = Cursors.Cross;
                 if (tempStartPoint == null)
                 {
                     // First click - save center point (using tempStartPoint)
                     tempStartPoint = clickedPoint;
+                    OnTempStartPointChanged.Invoke(tempStartPoint);
                 }
                 else
                 {
@@ -152,6 +157,7 @@ class DrawingCanvas : Panel
                     };
                     shapes.Add(newCircle);  // Add the new circle to the shapes list
                     tempStartPoint = null;  // Reset the center point
+                    OnTempStartPointChanged.Invoke(tempStartPoint);
                     this.Invalidate(); // Trigger redraw
                 }
                 break;
@@ -332,12 +338,14 @@ class DrawingCanvas : Panel
         // Trigger the event to update the side panel with editable fields
         OnUpdateSidePanel?.Invoke(panelData);
     }
+
     public void cancelLine()
     {
         if (tempStartPoint.HasValue)
         {
             // Reset drawing state
             tempStartPoint = null;
+            OnTempStartPointChanged.Invoke(tempStartPoint);
             this.Invalidate(); // Trigger a redraw
         }
     }
@@ -347,7 +355,6 @@ class DrawingCanvas : Panel
         showGrid = !showGrid;  // Toggle the boolean value
     }
 
-    // Center the canvas to the original position
     public void CenterCanvas()
     {
         // Start from the current centerPoint and animate toward the canvas center
