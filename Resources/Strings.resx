@@ -39,8 +39,8 @@
     <data name="DrawingMode">
     <value>Drawing Mode. Press ESC to cancel.</value>
   </data>
-    <data name="">
-    <value></value>
+    <data name="SnapButton">
+    <value>Snap to certain points in other shapes</value>
   </data>
     <data name="">
     <value></value>

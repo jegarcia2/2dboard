@@ -14,8 +14,8 @@ class DrawingCanvas : Panel
     private bool showGrid = false;  // Track grid visibility
     private int gridDimension = 30;
 
-
     public Color selectedColor = Color.White;
+    private bool snapEnabled = false;
 
     public DrawingCanvas()
     {
@@ -53,6 +53,21 @@ class DrawingCanvas : Panel
                 g.DrawLine(gridPen, 0, y, this.Width, y);
             }
         }
+
+        if (snapEnabled)
+        {
+            var currentMousePos = GetRelativeCoordinates(this.PointToClient(Cursor.Position));
+            // Find the nearest snap point (for lines and circles, same snap points)
+            Point? snapPoint = FindSnapPoint(currentMousePos);
+            if (snapPoint.HasValue)
+            {
+                currentMousePos = snapPoint.Value;  // Snap to the nearest key point
+                MousePosition = currentMousePos;
+
+                drawPoint(snapPoint, g);
+            }
+        }
+
         // Draw all shapes (lines, circles, etc.)
         foreach (var shape in shapes)
         {
@@ -191,31 +206,19 @@ class DrawingCanvas : Panel
 
     private void Canvas_MouseMove(object sender, MouseEventArgs e)
     {
-        Point relativePos = GetRelativeCoordinates(e.Location);  // Get coordinates relative to the center of the canvas
-
         if (isDragging)
         {
             Cursor = Cursors.SizeAll;
-            // Move the center point (dragging the canvas)
             centerPoint.X += e.X - lastMousePosition.X;
             centerPoint.Y += e.Y - lastMousePosition.Y;
             lastMousePosition = e.Location;
 
-            this.Invalidate(); // Redraw canvas
-        }
-        else if (selectedMouse == "Line" && tempStartPoint.HasValue)
-        {
-            // Update the preview line as the user drags the mouse
-            this.Invalidate(); // Redraw canvas to show the preview line
-        }
-        else if (selectedMouse == "Circle" && tempStartPoint.HasValue)
-        {
-            this.Invalidate(); // Redraw canvas to show the circle preview
         }
         else if (isErasing)
         {
             TryEraseAt(e.Location, true); // Continuous erasing
         }
+        this.Invalidate(); // Redraw canvas
     }
 
     private Point GetRelativeCoordinates(Point location)
@@ -259,17 +262,27 @@ class DrawingCanvas : Panel
         }
     }
 
-    private bool IsPointNearLine(Point p, Point a, Point b, int threshold = 5)
+    private bool IsPointNearLine(Point p, Point a, Point b, int threshold = 8)
     {
         float distance = DistanceFromPointToLine(p, a, b);
         return distance <= threshold;
     }
 
-    private bool IsPointNearCircle(Point p, Point center, float radius, int threshold = 5)
+    private bool IsPointNearCircle(Point p, Point center, float radius, int threshold = 8)
     {
         // Calculate the distance from the point to the circumference of the circle
         float distance = DistanceFromPointToCircle(p, center, radius);
         return distance <= threshold;  // Check if the distance is within the threshold
+    }
+
+    private bool IsPointNearPoint(Point p1, Point p2, float threshold = 8)
+    {
+        return Distance(p1, p2) <= threshold;  // Return true if the distance is within the threshold
+    }
+
+    private float Distance(Point p1, Point p2)
+    {
+        return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));  // Euclidean distance
     }
 
     private float DistanceFromPointToLine(Point p, Point a, Point b)
@@ -321,11 +334,6 @@ class DrawingCanvas : Panel
         }
     }
 
-    private float Distance(Point p1, Point p2)
-    {
-        return (float)Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
-    }
-
     private void ThrowInformationToSidePanel(IShape selectedShape)
     {
         SidePanelData panelData = new SidePanelData
@@ -353,6 +361,11 @@ class DrawingCanvas : Panel
     public void ToggleGrid()
     {
         showGrid = !showGrid;  // Toggle the boolean value
+    }
+
+    public void ToggleSnap()
+    {
+        snapEnabled = !snapEnabled;  // Toggle the boolean value
     }
 
     public void CenterCanvas()
@@ -383,6 +396,58 @@ class DrawingCanvas : Panel
             }
         };
         animationTimer.Start();  // Start the animation
+    }
+
+    private Point? FindSnapPoint(Point mousePos)
+    {
+        // Search all shapes for snap points
+        foreach (var shape in shapes)
+        {
+            if (shape is Line line)
+            {
+                // Find key points for the line (Start, Midpoint, End)
+                Point start = line.Start;
+                Point end = line.End;
+                Point midpoint = new Point((start.X + end.X) / 2, (start.Y + end.Y) / 2);
+
+                if (IsPointNearPoint(mousePos, start)) return start;
+                if (IsPointNearPoint(mousePos, midpoint)) return midpoint;
+                if (IsPointNearPoint(mousePos, end)) return end;
+            }
+            else if (shape is Circle circle)
+            {
+                // Find key points for the circle (Center, Cardinal points)
+                Point center = circle.Center;
+                Point top = new Point(center.X, (int)(center.Y - circle.Radius));
+                Point bottom = new Point(center.X, (int)(center.Y + circle.Radius));
+                Point left = new Point((int)(center.X - circle.Radius), center.Y);
+                Point right = new Point((int)(center.X + circle.Radius), center.Y);
+
+                if (IsPointNearPoint(mousePos, center)) return center;
+                if (IsPointNearPoint(mousePos, top)) return top;
+                if (IsPointNearPoint(mousePos, bottom)) return bottom;
+                if (IsPointNearPoint(mousePos, left)) return left;
+                if (IsPointNearPoint(mousePos, right)) return right;
+            }
+        }
+
+        return null;  // No snap point found
+    }
+
+    private void drawPoint(Point? point, Graphics g)
+    {
+        if (point.HasValue)
+        {
+            Point p = point.Value;
+
+            Point screenPoint = new Point(
+                centerPoint.X + p.X,
+                centerPoint.Y - p.Y
+            );
+
+            int radius = 4;
+            g.FillEllipse(Brushes.Red, screenPoint.X - radius, screenPoint.Y - radius, radius * 2, radius * 2);
+        }
     }
 
 }

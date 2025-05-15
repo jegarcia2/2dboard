@@ -39,8 +39,8 @@
     <data name="DrawingMode">
     <value>Modo dibujo. Presiona ESC para cancelar.</value>
   </data>
-    <data name="">
-    <value></value>
+    <data name="SnapButton">
+    <value>Pegarse a puntos especificos de otras figuras.</value>
   </data>
       <data name="">
     <value></value>

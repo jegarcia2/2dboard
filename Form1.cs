@@ -102,11 +102,31 @@ namespace _2dboard
                 Text = "Center",
                 Font = new Font("Arial", 6)  // Small font size for the button
             };
+
             centerButton.Click += (sender, e) =>
             {
                 canvas.CenterCanvas(); // Animate the canvas to the center
             };
+
             footerButtonPanel.Controls.Add(centerButton);
+
+            // Add button for toggling shape snapping
+            Button snapToShapeButton = new Button
+            {
+                Size = new Size(25, 25),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Pink,
+                Text = rm.GetString("SnapButton"),
+                Font = new Font("Arial", 6)  // Small font size for the button
+            };
+
+            snapToShapeButton.Click += (sender, e) =>
+            {
+                canvas.ToggleSnap();
+            };
+
+            // Add to footer
+            footerButtonPanel.Controls.Add(snapToShapeButton);
 
             // Add the footer button panel to the footer
             footerPanel.Controls.Add(footerButtonPanel);
