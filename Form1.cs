@@ -14,11 +14,11 @@ namespace _2dboard
         DrawingCanvas canvas;
         Panel sidePanel;
         string[] colors = new String[] { "White", "Red", "Green", "Blue", "Yellow" };
-
+        Size BUTTON_SIZE = new Size(25, 25);
         public Form1()
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-            Icon = new Icon("Resources/TEMP.ico");  // Set the form icon
+            Icon = new Icon("Resources/icons/TEMP.ico");  // Set the form icon
             //Creating Language Handler
             CultureInfo.CurrentUICulture = new CultureInfo(settings.Language);
             rm = new ResourceManager("_2dboard.Resources.Strings", typeof(Form1).Assembly);
@@ -51,6 +51,21 @@ namespace _2dboard
 
             mainLayout.Controls.Add(menuStrip, 0, 0);
 
+            //Icons List
+            // Create an ImageList with the desired button size
+            ImageList iconList = new ImageList();
+            iconList.ImageSize = new Size(20, 20);  // Resize all icons to 25 x 25
+
+            // Load the icon into the ImageList
+            iconList.Images.Add(Image.FromFile("Resources/icons/select.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/move.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/line.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/circle.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/erase.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/grid-1.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/center-canvas.ico"));
+            iconList.Images.Add(Image.FromFile("Resources/icons/snap.ico"));
+
             // Footer Panel where the buttons will go
             Panel footerPanel = new Panel
             {
@@ -80,12 +95,12 @@ namespace _2dboard
             // Grid Button
             Button gridButton = new Button
             {
-                Size = new Size(25, 25),
+                Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Green,
-                Text = "Grid",
-                Font = new Font("Arial", 6)  // Small font size for the button
+                BackColor = Color.White,
+                Image = iconList.Images[5],
             };
+
             gridButton.Click += (sender, e) =>
             {
                 canvas.ToggleGrid(); // Toggle grid visibility
@@ -96,11 +111,10 @@ namespace _2dboard
             // Center Canvas Button
             Button centerButton = new Button
             {
-                Size = new Size(25, 25),
+                Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Blue,
-                Text = "Center",
-                Font = new Font("Arial", 6)  // Small font size for the button
+                BackColor = Color.White,
+                Image = iconList.Images[6],
             };
 
             centerButton.Click += (sender, e) =>
@@ -113,11 +127,10 @@ namespace _2dboard
             // Add button for toggling shape snapping
             Button snapToShapeButton = new Button
             {
-                Size = new Size(25, 25),
+                Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Pink,
-                Text = rm.GetString("SnapButton"),
-                Font = new Font("Arial", 6)  // Small font size for the button
+                BackColor = Color.White,
+                Image = iconList.Images[7],
             };
 
             snapToShapeButton.Click += (sender, e) =>
@@ -193,16 +206,15 @@ namespace _2dboard
                 AutoSize = true,
                 FlowDirection = FlowDirection.LeftToRight,
             };
-
             // Buttons
-            Size BUTTON_SIZE = new Size(25, 25);
             //Select Button
+
             Button selectButton = new Button
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Red,
-                Image = Image.FromFile("Resources/TEMP.ico"), // Set the custom icon
+                BackColor = Color.White,
+                Image = iconList.Images[0],
             };
 
             selectButton.Click += (sender, e) =>
@@ -218,7 +230,8 @@ namespace _2dboard
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Black
+                BackColor = Color.White,
+                Image = iconList.Images[1],
             };
 
             moveButton.Click += (sender, e) =>
@@ -234,7 +247,8 @@ namespace _2dboard
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Blue
+                BackColor = Color.White,
+                Image = iconList.Images[2],
             };
 
             lineButton.Click += (sender, e) =>
@@ -249,7 +263,8 @@ namespace _2dboard
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Orange  // Choose a color for the circle button
+                BackColor = Color.White,
+                Image = iconList.Images[3],
             };
 
             circleButton.Click += (sender, e) =>
@@ -265,7 +280,8 @@ namespace _2dboard
             {
                 Size = BUTTON_SIZE,
                 FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Purple
+                BackColor = Color.White,
+                Image = iconList.Images[4],
             };
 
             eraserButton.Click += (sender, e) =>
