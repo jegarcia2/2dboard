@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle">
-    <value>Mi Aplicacion</value>
+    <value>Tablero 2D</value>
   </data>
   <data name="HelloWorld">
     <value>Hola Mundo!</value>

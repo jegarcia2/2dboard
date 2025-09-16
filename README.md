@@ -1,42 +1,54 @@
 # Prototipo CAD en C# con Canvas
 
-Este es un prototipo de aplicación CAD desarrollado desde cero en C# utilizando Canvas. Permite la creación de líneas y círculos con varias funcionalidades avanzadas como selección de lenguaje, borrado dinámico y más. ¡Una excelente práctica en organización y visualización de datos!
+Este proyecto es un **prototipo de aplicación CAD** desarrollado desde cero en **C#** utilizando **Canvas**. El objetivo es crear una plataforma sencilla para la **creación y edición de dibujos 2D** con funcionalidades personalizadas, como la **selección de idioma**, **borrado dinámico**, **visualización por coordenadas** y mucho más.
+
+Este prototipo pone énfasis en la organización eficiente y la **interactividad** del usuario, con una interfaz fluida y herramientas intuitivas.
 
 ## Características
-- **Selección de Lenguaje:** Interfaz en español e inglés usando archivos `.resx` para un menú completamente funcional en ambos idiomas.
-- **Dibujo de Líneas y Círculos:** Herramientas para crear figuras con múltiples opciones de color.
-- **Propiedades Dinámicas:** Cambia características de líneas en tiempo real con solo seleccionarlas.
-- **Borrado Dinámico:** Borrado de objetos al estilo recorte.
-- **Visualización por Coordenadas:** Guía de coordenadas en la pantalla para facilitar el dibujo.
-- **Funciones Beta:** Regresar al centro, habilitar grid y activar SNAP TO POINT.
+
+### **Selección de Lenguaje**
+- El proyecto incluye **soporte multilingüe** con opciones para mostrar la interfaz en **español e inglés**, utilizando archivos `.resx` para gestionar los textos. Esto garantiza que la aplicación sea accesible a una audiencia más amplia y pueda ser fácilmente extendida a otros idiomas en el futuro.
+
+### **Herramientas de Dibujo: Líneas y Círculos**
+- Permite al usuario crear **líneas** y **círculos** con una interfaz directa y funcional. Las herramientas permiten modificar las propiedades de los elementos de manera dinámica, mejorando la experiencia del usuario al no tener que realizar pasos adicionales para editar sus dibujos.
+  
+  - **Dibujo de Líneas:** Las líneas se pueden crear de forma rápida con distintas configuraciones de color.
+  ![LINE  DRAWING](Resources\captures\draw.gif)
+  - **Dibujo de Círculos:** Similar al dibujo de líneas, pero con opciones para ajustar el radio y color de los círculos.
+  - **Selección de Color:** Cada figura creada permite cambiar su color a través de un menú de opciones dinámico.
+
+### **Propiedades Dinámicas**
+- Los **atributos de las líneas** y **círculos** pueden ser modificados en **tiempo real**. Solo basta con seleccionar el objeto y sus propiedades se actualizan inmediatamente (como el color, el grosor de línea, etc.), lo cual facilita el diseño de planos sin necesidad de realizar modificaciones complicadas.
+
+### **Borrado Dinámico**
+- El sistema permite eliminar objetos de forma sencilla, con un estilo de **borrado recortado**: la herramienta de borrado elimina solo los objetos seleccionados al pasar por encima de ellos, lo que facilita la edición en tiempo real sin complicaciones.
+
+### **Visualización por Coordenadas**
+- Se muestra una **guía de coordenadas** en la pantalla para facilitar la creación y edición de objetos. Esta funcionalidad permite a los usuarios crear dibujos con precisión, garantizando que las líneas y los círculos estén alineados y sean simétricos.
+
+### **Funciones Beta**
+- Se incluyen algunas funcionalidades experimentales que están siendo desarrolladas o mejoradas:
+  - **Snap to Point:** Ajuste automático al punto más cercano al mover el mouse.
+  - **Grid (Rejilla):** Habilitación de una cuadrícula visual para facilitar el dibujo.
+  - **Regresar al Centro:** Opción para centrar el lienzo en la pantalla.
+
+### **Futuras Mejoras**
+- **Transición de 2D a 3D:** Una de las futuras características que planeo agregar es la capacidad de visualizar los objetos en 3D (al menos de manera no editable), comenzando por los círculos.
+- **Acotación:** Se quiere permitir que los usuarios obtengan medidas de los objetos dibujados, una función fundamental para los programas CAD completos.
+- **Mejoras en la precisión y control del Snap to Grid**: Actualmente en fase beta, esta herramienta se ampliará para ser más precisa y útil en planos complejos.
 
 ## Tecnologías
-- C#
-- Canvas
-- Resx (para la internacionalización)
+Este proyecto utiliza una serie de tecnologías clave para su desarrollo:
 
+- **C#**: Lenguaje principal utilizado para el desarrollo de la aplicación.
+- **Canvas**: Permite la creación y renderizado de los elementos gráficos (líneas, círculos) en la interfaz.
+- **Resx**: Para la internacionalización y la creación de interfaces multilingües.
+- **WinForms**: Para la interfaz de usuario, utilizando controles estándar de Windows.
+  
 ## Instalación
 
-1. Clona este repositorio:
+Para comenzar a usar este proyecto en tu entorno local, sigue los siguientes pasos:
+
+1. **Clona este repositorio:**
    ```bash
-   git clone https://github.com/tuusuario/prototipo-cad.git
-   ```
-
-2. Abre el proyecto en Visual Studio o en el IDE de tu preferencia.
-
-3. Corre el proyecto y disfruta de la interfaz de usuario.
-
-## Uso
-
-- Selecciona el idioma desde el menú.
-- Dibuja líneas y círculos.
-- Modifica las propiedades de los elementos seleccionados.
-
-## Capturas de Pantalla
-![Imagen del Proyecto]()
-
-## Contribuciones
-¡Si te interesa colaborar o tienes sugerencias, no dudes en abrir un *issue* o hacer un *pull request*!
-
-## Feedback
-Estoy buscando mejorar constantemente el proyecto, cualquier sugerencia es bienvenida.
+   git clone https://github.com/jegarcia2/2dboard.git
