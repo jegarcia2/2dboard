@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("2dboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2901044b7071a087fb05849a3c7494657e2a5447")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7ae47cf0a34b6f586addf6db03bfd3f2786bb15e")]
 [assembly: System.Reflection.AssemblyProductAttribute("2dboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("2dboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

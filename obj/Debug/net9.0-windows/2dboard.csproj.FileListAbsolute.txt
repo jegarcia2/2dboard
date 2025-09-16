@@ -19,3 +19,14 @@ C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\_2
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\es\2dboard.resources.cs
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\es\2dboard.resources.dll
 C:\Users\jose_\OneDrive\Escritorio\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.sourcelink.json
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\_2dboard.Resources.Strings.resources
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\_2dboard.Resources.Strings.es.resources
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.csproj.GenerateResource.cache
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.GeneratedMSBuildEditorConfig.editorconfig
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.AssemblyInfoInputs.cache
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.AssemblyInfo.cs
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.csproj.CoreCompileInputs.cache
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.sourcelink.json
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.dll
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\refint\2dboard.dll
+G:\Other computers\Mi portátil (1)\Proyectos\2dboard\obj\Debug\net9.0-windows\2dboard.pdb
