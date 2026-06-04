@@ -16,14 +16,25 @@ class DrawingCanvas : Panel
 
     public Color selectedColor = Color.White;
     private bool snapEnabled = false;
+    private bool centerInitialized = false;
+    private System.Windows.Forms.Timer? _centerTimer;
 
     public DrawingCanvas()
     {
         this.DoubleBuffered = true; // Prevent flickering
-        this.centerPoint = new Point(Width / 2, Height / 2); // Start at center
         this.MouseDown += Canvas_MouseDown;
         this.MouseMove += Canvas_MouseMove;
         this.MouseUp += Canvas_MouseUp;
+    }
+
+    protected override void OnResize(EventArgs e)
+    {
+        base.OnResize(e);
+        if (!centerInitialized && Width > 0 && Height > 0)
+        {
+            centerPoint = new Point(Width / 2, Height / 2);
+            centerInitialized = true;
+        }
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -115,6 +126,11 @@ class DrawingCanvas : Panel
     private void Canvas_MouseDown(object sender, MouseEventArgs e)
     {
         Point clickedPoint = GetRelativeCoordinates(e.Location);
+        if (snapEnabled)
+        {
+            Point? snapped = FindSnapPoint(clickedPoint);
+            if (snapped.HasValue) clickedPoint = snapped.Value;
+        }
 
         switch (selectedMouse)
         {
@@ -370,32 +386,32 @@ class DrawingCanvas : Panel
 
     public void CenterCanvas()
     {
-        // Start from the current centerPoint and animate toward the canvas center
+        // Stop any in-progress centering animation before starting a new one.
+        _centerTimer?.Stop();
+        _centerTimer?.Dispose();
+
         Point targetCenter = new Point(this.Width / 2, this.Height / 2);
 
-        // Animating smoothly by moving towards the target center
-        var animationTimer = new System.Windows.Forms.Timer();
-        animationTimer.Interval = 10; // Set to adjust the speed of the movement
-        animationTimer.Tick += (sender, e) =>
+        _centerTimer = new System.Windows.Forms.Timer();
+        _centerTimer.Interval = 10;
+        _centerTimer.Tick += (sender, e) =>
         {
-            // Calculate delta (how much to move in each step)
             int deltaX = (targetCenter.X - centerPoint.X) / 10;
             int deltaY = (targetCenter.Y - centerPoint.Y) / 10;
 
-            // Stop the animation when the center is close enough to the target
-            if (Math.Abs(targetCenter.X - centerPoint.X) < 10 && Math.Abs(targetCenter.Y - centerPoint.Y) < 10)  // Tolerance of 2 pixels
+            if (Math.Abs(targetCenter.X - centerPoint.X) < 10 && Math.Abs(targetCenter.Y - centerPoint.Y) < 10)
             {
-                centerPoint = targetCenter;  // Set centerPoint directly to the target to avoid overshooting
-                animationTimer.Stop(); // Stop the animation timer
+                centerPoint = targetCenter;
+                Invalidate();
+                _centerTimer.Stop();
             }
             else
             {
-                // Move towards the target
                 centerPoint = new Point(centerPoint.X + deltaX, centerPoint.Y + deltaY);
-                Invalidate(); // Redraw canvas to reflect the new position
+                Invalidate();
             }
         };
-        animationTimer.Start();  // Start the animation
+        _centerTimer.Start();
     }
 
     private Point? FindSnapPoint(Point mousePos)

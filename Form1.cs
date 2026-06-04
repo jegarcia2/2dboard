@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace _2dboard
@@ -18,7 +17,17 @@ namespace _2dboard
         public Form1()
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-            Icon = new Icon("Resources/icons/TEMP.ico");  // Set the form icon
+            
+            // Load form icon with error handling
+            try
+            {
+                Icon = new Icon("Resources/icons/TEMP.ico");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Warning: Could not load form icon. " + ex.Message, "Icon Error");
+            }
+
             //Creating Language Handler
             CultureInfo.CurrentUICulture = new CultureInfo(settings.Language);
             rm = new ResourceManager("_2dboard.Resources.Strings", typeof(Form1).Assembly);
@@ -56,15 +65,33 @@ namespace _2dboard
             ImageList iconList = new ImageList();
             iconList.ImageSize = new Size(20, 20);  // Resize all icons to 25 x 25
 
-            // Load the icon into the ImageList
-            iconList.Images.Add(Image.FromFile("Resources/icons/select.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/move.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/line.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/circle.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/erase.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/grid-1.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/center-canvas.ico"));
-            iconList.Images.Add(Image.FromFile("Resources/icons/snap.ico"));
+            // Load the icons with error handling
+            string[] iconPaths = new string[]
+            {
+                "Resources/icons/select.ico",
+                "Resources/icons/move.ico",
+                "Resources/icons/line.ico",
+                "Resources/icons/circle.ico",
+                "Resources/icons/erase.ico",
+                "Resources/icons/grid-1.ico",
+                "Resources/icons/center-canvas.ico",
+                "Resources/icons/snap.ico"
+            };
+
+            foreach (var iconPath in iconPaths)
+            {
+                try
+                {
+                    iconList.Images.Add(Image.FromFile(iconPath));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Warning: Could not load icon '{iconPath}'. {ex.Message}", "Icon Error");
+                    // Add a placeholder image instead of crashing
+                    Bitmap placeholder = new Bitmap(20, 20);
+                    iconList.Images.Add(placeholder);
+                }
+            }
 
             // Footer Panel where the buttons will go
             Panel footerPanel = new Panel
@@ -358,7 +385,7 @@ namespace _2dboard
             };
             TextBox lengthTextBox = new TextBox
             {
-                Text = panelData.Length,
+                Text = panelData.Length ?? "",
                 Dock = DockStyle.Top,
                 ReadOnly = true
             };
@@ -372,7 +399,7 @@ namespace _2dboard
             };
             TextBox point1XTextBox = new TextBox
             {
-                Text = panelData.Point1X,
+                Text = panelData.Point1X ?? "",
                 Dock = DockStyle.Top,
                 ReadOnly = true
             };
@@ -385,7 +412,7 @@ namespace _2dboard
             };
             TextBox point1YTextBox = new TextBox
             {
-                Text = panelData.Point1Y,
+                Text = panelData.Point1Y ?? "",
                 Dock = DockStyle.Top,
                 ReadOnly = true
             };
@@ -399,7 +426,7 @@ namespace _2dboard
             };
             TextBox point2XTextBox = new TextBox
             {
-                Text = panelData.Point2X,
+                Text = panelData.Point2X ?? "",
                 Dock = DockStyle.Top,
                 ReadOnly = true
             };
@@ -413,7 +440,7 @@ namespace _2dboard
             };
             TextBox point2YTextBox = new TextBox
             {
-                Text = panelData.Point2Y,
+                Text = panelData.Point2Y ?? "",
                 Dock = DockStyle.Top,
                 ReadOnly = true
             };
@@ -430,22 +457,24 @@ namespace _2dboard
             ComboBox colorComboBox = new ComboBox
             {
                 Dock = DockStyle.Top,
-                DataSource = colors, // Bind to the color array
+                DataSource = colors,
             };
 
-            // Add event handler for color selection
+            // The flag prevents the handler from firing during the build phase.
+            // DataSource binding can trigger SelectedIndexChanged with SelectedItem == null
+            // when the control's handle is created inside Controls.Add on a visible panel.
+            bool colorSetupComplete = false;
+
             colorComboBox.SelectedIndexChanged += (sender, e) =>
             {
-                // Update the line color when a new color is selected
+                if (!colorSetupComplete || colorComboBox.SelectedItem == null) return;
                 var selectedColor = Color.FromName(colorComboBox.SelectedItem.ToString());
-                // Update the line's color with the selected color (you can add your logic for this)
-                UpdateShapeColor(selectedColor); // Method that will handle the update (to be implemented)
-                canvas.Invalidate(); // Trigger a redraw
+                UpdateShapeColor(selectedColor);
+                canvas.Invalidate();
             };
 
-            // Optionally, add event handlers to update line data when values are changed
-            // For example, update `drawingCanvas`'s line data when the user edits the fields
-            // Add labels and textboxes to the panel in the correct order
+            // With DockStyle.Top, WinForms docks in reverse Z-order (last added = topmost),
+            // so the add sequence below is intentionally reversed from the visual top-to-bottom order.
             sidePanel.Controls.Add(lengthTextBox);
             sidePanel.Controls.Add(lengthLabel);
 
@@ -464,7 +493,11 @@ namespace _2dboard
             sidePanel.Controls.Add(colorComboBox);
             sidePanel.Controls.Add(colorLabel);
 
-            colorComboBox.SelectedIndex = Array.IndexOf(colors, panelData.Color);
+            // Set the selection after Controls.Add so the DataSource binding is fully
+            // initialized before we apply the shape's current color.
+            int colorIndex = Array.IndexOf(colors, panelData.Color);
+            colorComboBox.SelectedIndex = (colorIndex >= 0) ? colorIndex : 0;
+            colorSetupComplete = true;
         }
 
         private void UpdateShapeColor(Color newColor)
@@ -478,7 +511,7 @@ namespace _2dboard
 
                 selectedShape.Color = newColor;  // Update color of the Circle
 
-                Invalidate();  // Trigger a redraw to reflect the color change
+                canvas.Invalidate();  // Trigger a redraw to reflect the color change
             }
         }
 
